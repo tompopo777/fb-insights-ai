@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Upload {
+  id        Int        @id @default(autoincrement())
+  fileName  String
+  createdAt DateTime   @default(now())
+  posts     Post[]
+  analysis  Analysis?
+}
+
+model Post {
+  id          Int      @id @default(autoincrement())
+  dateTime    DateTime
+  postType    String
+  title       String
+  impressions Int
+  likes       Int
+  comments    Int
+  shares      Int
+  clicks      Int
+  uploadId    Int
+  upload      Upload   @relation(fields: [uploadId], references: [id])
+}
+
+model Analysis {
+  id        Int      @id @default(autoincrement())
+  summary   String   @db.Text
+  recommendations String   @db.Text
+  createdAt DateTime @default(now())
+  uploadId  Int      @unique
+  upload    Upload   @relation(fields: [uploadId], references: [id])
+}
