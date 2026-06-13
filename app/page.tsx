@@ -16,6 +16,8 @@ import { db } from '@/lib/db'
 import { calculateCTR, calculateEngagementRate } from '@/lib/calculateMetrics'
 import Dashboard from '@/components/Dashboard'
 
+export const revalidate = 0
+
 export default async function Home() {
   const uploads = await db.upload.findMany({
     include: { posts: true },
