@@ -60,7 +60,7 @@ export default function AnalysisPage({ uploads }: AnalysisPageProps) {
   }
 
   return (
-    <main className="p-8 space-y-6">
+    <main className="p-4 md:p-8 space-y-6">
       <div className="flex items-center gap-4">
         <Button variant="outline" onClick={() => router.push('/')}>
           ← Back
@@ -74,12 +74,12 @@ export default function AnalysisPage({ uploads }: AnalysisPageProps) {
         <CardHeader>
           <CardTitle>Select a batch to analyze</CardTitle>
         </CardHeader>
-        <CardContent className="flex gap-4">
+        <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <Select
             value={selectedUploadId}
             onValueChange={(value) => value && setSelectedUploadId(value)}
           >
-            <SelectTrigger className="w-72">
+            <SelectTrigger className="w-full sm:w-72">
                 <SelectValue placeholder="Select a batch...">
                     {selectedUploadId
                     ? uploads.find((u) => String(u.id) === selectedUploadId)?.fileName + ` (${new Date(uploads.find((u) => String(u.id) === selectedUploadId)?.createdAt ?? '').toLocaleDateString()})`

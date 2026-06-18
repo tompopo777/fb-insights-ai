@@ -119,9 +119,9 @@ export default function Dashboard({ posts, summary, uploads }: DashboardProps) {
     })
 
     return (
-        <main className="p-8 space-y-6">
+        <main className="p-4 md:p-8 space-y-6">
             {/* // Header (buttons) */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h1 className="text-3xl font-bold">FB Analytics</h1>
                 <div className="flex gap-2">
                     <Button variant="outline" onClick={() => setManageOpen(true)}>Manage uploads</Button>
@@ -129,7 +129,7 @@ export default function Dashboard({ posts, summary, uploads }: DashboardProps) {
                 </div>
             </div>
             {/* // Summary Cards */}
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Card>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">Total posts</CardTitle>
@@ -169,7 +169,7 @@ export default function Dashboard({ posts, summary, uploads }: DashboardProps) {
             </div>
 
             {/* // Order Dropdown */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm text-muted-foreground">{summary.totalPosts} posts</p>
                 <Select value={orderBy} onValueChange={(value) => value && setOrderBy(value)}>
                     <SelectTrigger className="w-48">
@@ -190,6 +190,7 @@ export default function Dashboard({ posts, summary, uploads }: DashboardProps) {
                     No posts to display. Upload a CSV to see your summary here.
                 </div>  
             ) : (
+                <div className="overflow-x-auto">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -224,6 +225,7 @@ export default function Dashboard({ posts, summary, uploads }: DashboardProps) {
                         ))}
                     </TableBody>
                 </Table>
+                </div>
             )}
             <Dialog open={manageOpen} onOpenChange={handleManageOpenChange}>
                 <DialogContent className="sm:max-w-md">
