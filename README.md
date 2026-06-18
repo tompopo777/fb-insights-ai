@@ -1,14 +1,14 @@
-# 📊 FB Insights AI
+# FB Insights AI
  
 A Facebook community analytics dashboard powered by AI. Upload your Facebook post data, visualize key metrics, and get AI-generated insights and recommendations.
  
-## 🔗 Live Demo
+## Live Demo
  
 [fb-insights-ai.vercel.app](https://fb-insights-ai.vercel.app)
  
 ---
  
-## 📸 Screenshots
+## Screenshots
  
 ### Dashboard
 <img src="./public/screenshots/Dashboard 1.png" width="800" alt="Dashboard" />
@@ -24,7 +24,7 @@ A Facebook community analytics dashboard powered by AI. Upload your Facebook pos
  
 ---
  
-## ✨ Features
+## Features
  
 - 📂 **CSV Upload** — Upload Facebook post data exported from Meta Business Suite
 - 📈 **Analytics Dashboard** — View all posts with calculated CTR% and Engagement Rate%
@@ -34,7 +34,7 @@ A Facebook community analytics dashboard powered by AI. Upload your Facebook pos
 - 🔍 **Duplicate Detection** — Detects duplicate file uploads and prompts to replace existing data
 ---
  
-## 🛠️ Tech Stack
+## Tech Stack
  
 | Layer | Technology |
 |---|---|
@@ -48,7 +48,7 @@ A Facebook community analytics dashboard powered by AI. Upload your Facebook pos
  
 ---
  
-## 📋 CSV Format
+## CSV Format
  
 The application expects a CSV file exported from Meta Business Suite with the following columns:
  
@@ -68,7 +68,7 @@ The application expects a CSV file exported from Meta Business Suite with the fo
  
 ---
 
-## 📐 KPI Calculations
+## KPI Calculations
  
 | Metric | Formula |
 |---|---|
@@ -77,7 +77,7 @@ The application expects a CSV file exported from Meta Business Suite with the fo
  
 ---
  
-## 🚀 Getting Started
+## Getting Started
  
 ### Prerequisites
  
@@ -117,7 +117,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the app.
  
 ---
  
-## 📁 Project Structure
+## Project Structure
  
 ```
 fb-insights-ai/
