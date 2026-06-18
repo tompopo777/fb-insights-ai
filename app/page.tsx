@@ -67,5 +67,12 @@ export default async function Home() {
         ),
   }
 
-  return <Dashboard posts={posts} summary={summary} />
+  const uploadList = uploads.map((upload) => ({
+    id: upload.id,
+    fileName: upload.fileName,
+    createdAt: upload.createdAt,
+    postCount: upload.posts.length,
+  }))
+
+  return <Dashboard posts={posts} summary={summary} uploads={uploadList} />
 }

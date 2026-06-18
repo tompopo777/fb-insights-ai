@@ -25,11 +25,25 @@ import {
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog'
 import { useRouter } from 'next/navigation'
 
 
+interface Upload {
+    id: number
+    fileName: string
+    createdAt: Date
+    postCount: number
+}
+
 interface Post {
     id: number
+    uploadId: number
     fileName: string
     dateTime: Date
     postType: string
@@ -54,14 +68,46 @@ interface Summary {
 interface DashboardProps {
     posts: Post[]
     summary: Summary
+    uploads: Upload[]
 }
 
-export default function Dashboard({ posts, summary }: DashboardProps) {
+export default function Dashboard({ posts, summary, uploads }: DashboardProps) {
     // posts = [];
     const router = useRouter()
 
     // const [orderBy, setOrderBy] = useState('date-desc')
     const [orderBy, setOrderBy] = useState<string>('date-desc')
+    const [manageOpen, setManageOpen] = useState(false)
+    const [activeTab, setActiveTab] = useState<'upload' | 'delete'>('upload')
+    const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null)
+    const [deleting, setDeleting] = useState(false)
+    const [deleteError, setDeleteError] = useState('')
+
+    async function handleDelete(uploadId: number) {
+        setDeleting(true)
+        setDeleteError('')
+
+        const res = await fetch(`/api/upload?id=${uploadId}`, { method: 'DELETE' })
+
+        if (res.ok) {
+            setPendingDeleteId(null)
+            router.refresh()
+        } else {
+            const data = await res.json()
+            setDeleteError(data.error ?? 'Delete failed')
+        }
+
+        setDeleting(false)
+    }
+
+    function handleManageOpenChange(open: boolean) {
+        setManageOpen(open)
+        if (!open) {
+            setActiveTab('upload')
+            setPendingDeleteId(null)
+            setDeleteError('')
+        }
+    }
 
 
     const sortedPosts = [...posts].sort((a, b) => {
@@ -78,8 +124,7 @@ export default function Dashboard({ posts, summary }: DashboardProps) {
             <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold">FB Analytics</h1>
                 <div className="flex gap-2">
-                    <UploadCsv />
-                    {/* <Button>Analyze with AI</Button> */}
+                    <Button variant="outline" onClick={() => setManageOpen(true)}>Manage uploads</Button>
                     <Button onClick={() => router.push('/analysis')}>Analyze with AI</Button>
                 </div>
             </div>
@@ -180,6 +225,66 @@ export default function Dashboard({ posts, summary }: DashboardProps) {
                     </TableBody>
                 </Table>
             )}
+            <Dialog open={manageOpen} onOpenChange={handleManageOpenChange}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Manage uploads</DialogTitle>
+                    </DialogHeader>
+                    <div className="flex gap-4 border-b">
+                        <button
+                            className={`pb-2 text-sm ${activeTab === 'upload' ? 'border-b-2 border-foreground font-medium' : 'text-muted-foreground'}`}
+                            onClick={() => setActiveTab('upload')}
+                        >
+                            Upload
+                        </button>
+                        <button
+                            className={`pb-2 text-sm ${activeTab === 'delete' ? 'border-b-2 border-foreground font-medium' : 'text-muted-foreground'}`}
+                            onClick={() => setActiveTab('delete')}
+                        >
+                            Delete
+                        </button>
+                    </div>
+                    {activeTab === 'upload' && (
+                        <UploadCsv onSuccess={() => setManageOpen(false)} />
+                    )}
+                    {activeTab === 'delete' && (
+                        <div className="space-y-2">
+                            {uploads.length === 0 ? (
+                                <p className="text-sm text-muted-foreground">No uploads yet.</p>
+                            ) : (
+                                uploads.map((upload) => (
+                                    <div key={upload.id} className="flex items-center justify-between rounded-md border p-3">
+                                        {pendingDeleteId === upload.id ? (
+                                            <div className="flex w-full items-center justify-between gap-2">
+                                                <p className="text-sm">Delete &quot;{upload.fileName}&quot;?</p>
+                                                <div className="flex gap-2">
+                                                    <Button variant="outline" size="sm" onClick={() => { setPendingDeleteId(null); setDeleteError('') }} disabled={deleting}>Cancel</Button>
+                                                    <Button variant="destructive" size="sm" onClick={() => handleDelete(upload.id)} disabled={deleting}>
+                                                        {deleting ? 'Deleting...' : 'Delete'}
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <div>
+                                                    <p className="text-sm font-medium">{upload.fileName}</p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {new Date(upload.createdAt).toLocaleDateString()} · {upload.postCount} posts
+                                                    </p>
+                                                </div>
+                                                <Button variant="ghost" size="sm" onClick={() => { setPendingDeleteId(upload.id); setDeleteError('') }}>
+                                                    Delete
+                                                </Button>
+                                            </>
+                                        )}
+                                    </div>
+                                ))
+                            )}
+                            {deleteError && <p className="text-sm text-destructive">{deleteError}</p>}
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
         </main>
     )
 }

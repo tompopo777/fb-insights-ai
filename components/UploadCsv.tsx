@@ -2,22 +2,25 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
 
+interface UploadCsvProps {
+    onSuccess?: () => void
+}
 
-export default function UploadCsv() {
+export default function UploadCsv({ onSuccess }: UploadCsvProps) {
     const [uploading, setUploading] = useState(false)
-    const [message, setMessage] = useState('')
+    const [error, setError] = useState('')
+    const [duplicateFile, setDuplicateFile] = useState<File | null>(null)
     const router = useRouter()
 
-    async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
-        const file = e.target.files?.[0]
-        if (!file) return
-
+    async function uploadFile(file: File, replace = false) {
         setUploading(true)
-        setMessage('')
+        setError('')
 
         const formData = new FormData()
         formData.append('file', file)
+        formData.append('replace', replace ? 'true' : 'false')
 
         const res = await fetch('/api/upload', {
             method: 'POST',
@@ -27,26 +30,60 @@ export default function UploadCsv() {
         const data = await res.json()
 
         if (res.ok) {
-            setMessage(`Upload Success! Upload ID: ${data.fileName}`)
-            router.push('/')
-            router.refresh()  
+            setDuplicateFile(null)
+            router.refresh()
+            onSuccess?.()
+        } else if (res.status === 409) {
+            setDuplicateFile(file)
         } else {
-            setMessage(`Upload failed: ${data.error}`)
+            setError(data.error ?? 'Upload failed')
         }
 
         setUploading(false)
     }
 
+    async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0]
+        e.target.value = ''
+
+        if (!file) return
+
+        await uploadFile(file)
+    }
+
+    async function handleReplace() {
+        if (!duplicateFile) return
+        await uploadFile(duplicateFile, true)
+    }
+
+    function handleCancel() {
+        setDuplicateFile(null)
+        setError('')
+    }
+
     return (
-        <div>
+        <div className="space-y-3">
             <input
-                type= "file"
-                accept = ".csv"
-                onChange = { handleUpload }
-                disabled = { uploading }
+                type="file"
+                accept=".csv"
+                onChange={handleUpload}
+                disabled={uploading}
             />
-            { uploading && <p>Uploading...</p>}
-            { message && <p>{ message } </p> }
+            {uploading && <p className="text-sm text-muted-foreground">Uploading...</p>}
+            {error && <p className="text-sm text-destructive">{error}</p>}
+            {duplicateFile && (
+                <div className="space-y-2 rounded-md border p-3">
+                    <p className="text-sm">&quot;{duplicateFile.name}&quot; already exists. Replace it?</p>
+                    <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={handleCancel} disabled={uploading}>
+                            Cancel
+                        </Button>
+                        <Button size="sm" onClick={handleReplace} disabled={uploading}>
+                            {uploading ? 'Replacing...' : 'Replace'}
+                        </Button>
+                    </div>
+                </div>
+            )}
         </div>
-  )
+    )
 }
