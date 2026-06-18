@@ -65,7 +65,10 @@ export default function AnalysisPage({ uploads }: AnalysisPageProps) {
         <Button variant="outline" onClick={() => router.push('/')}>
           ← Back
         </Button>
-        <h1 className="text-3xl font-bold">AI Analysis</h1>
+        <div className="flex items-baseline gap-3">
+          <h1 className="text-3xl font-bold">AI Analysis</h1>
+          <p className="text-sm text-muted-foreground">Powered by OpenAI · gpt-4o-mini</p>
+        </div>
       </div>
       <Card>
         <CardHeader>

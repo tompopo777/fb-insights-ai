@@ -153,7 +153,7 @@ export default function Dashboard({ posts, summary, uploads }: DashboardProps) {
                         <CardTitle className="text-sm font-medium text-muted-foreground">Avg CTR</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-2xl font-bold">{summary.avgCTR}%</p>
+                        <p className="text-2xl font-bold">{summary.avgCTR.toFixed(2)}%</p>
                         <p className="text-xs text-muted-foreground">clicks / impressions</p>
                     </CardContent>
                 </Card>
@@ -162,7 +162,7 @@ export default function Dashboard({ posts, summary, uploads }: DashboardProps) {
                         <CardTitle className="text-sm font-medium text-muted-foreground">Avg engagement</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-2xl font-bold">{summary.avgEngagement}%</p>
+                        <p className="text-2xl font-bold">{summary.avgEngagement.toFixed(2)}%</p>
                         <p className="text-xs text-muted-foreground">likes + comments + shares</p>
                     </CardContent>
                 </Card>
@@ -202,8 +202,8 @@ export default function Dashboard({ posts, summary, uploads }: DashboardProps) {
                             <TableHead>Comments</TableHead>
                             <TableHead>Shares</TableHead>
                             <TableHead>Clicks</TableHead>
-                            <TableHead>CTR%</TableHead>
-                            <TableHead>Eng%</TableHead>
+                            <TableHead className="text-right">CTR%</TableHead>
+                            <TableHead className="text-right">Eng%</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -218,15 +218,15 @@ export default function Dashboard({ posts, summary, uploads }: DashboardProps) {
                                 <TableCell>{post.comments}</TableCell>
                                 <TableCell>{post.shares}</TableCell>
                                 <TableCell>{post.clicks}</TableCell>
-                                <TableCell>{post.ctr}</TableCell>
-                                <TableCell>{post.engagementRate}</TableCell>
+                                <TableCell className="text-right">{post.ctr.toFixed(2)}</TableCell>
+                                <TableCell className="text-right">{post.engagementRate.toFixed(2)}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             )}
             <Dialog open={manageOpen} onOpenChange={handleManageOpenChange}>
-                <DialogContent>
+                <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle>Manage uploads</DialogTitle>
                     </DialogHeader>
@@ -244,45 +244,47 @@ export default function Dashboard({ posts, summary, uploads }: DashboardProps) {
                             Delete
                         </button>
                     </div>
-                    {activeTab === 'upload' && (
-                        <UploadCsv onSuccess={() => setManageOpen(false)} />
-                    )}
-                    {activeTab === 'delete' && (
-                        <div className="space-y-2">
-                            {uploads.length === 0 ? (
-                                <p className="text-sm text-muted-foreground">No uploads yet.</p>
-                            ) : (
-                                uploads.map((upload) => (
-                                    <div key={upload.id} className="flex items-center justify-between rounded-md border p-3">
-                                        {pendingDeleteId === upload.id ? (
-                                            <div className="flex w-full items-center justify-between gap-2">
-                                                <p className="text-sm">Delete &quot;{upload.fileName}&quot;?</p>
-                                                <div className="flex gap-2">
-                                                    <Button variant="outline" size="sm" onClick={() => { setPendingDeleteId(null); setDeleteError('') }} disabled={deleting}>Cancel</Button>
-                                                    <Button variant="destructive" size="sm" onClick={() => handleDelete(upload.id)} disabled={deleting}>
-                                                        {deleting ? 'Deleting...' : 'Delete'}
+                    <div className="h-56 overflow-y-auto">
+                        {activeTab === 'upload' && (
+                            <UploadCsv onSuccess={() => setManageOpen(false)} />
+                        )}
+                        {activeTab === 'delete' && (
+                            <div className="space-y-2">
+                                {uploads.length === 0 ? (
+                                    <p className="text-sm text-muted-foreground">No uploads yet.</p>
+                                ) : (
+                                    uploads.map((upload) => (
+                                        <div key={upload.id} className="flex items-center justify-between rounded-md border p-3">
+                                            {pendingDeleteId === upload.id ? (
+                                                <div className="flex w-full items-center justify-between gap-2">
+                                                    <p className="text-sm">Delete &quot;{upload.fileName}&quot;?</p>
+                                                    <div className="flex gap-2">
+                                                        <Button variant="outline" size="sm" onClick={() => { setPendingDeleteId(null); setDeleteError('') }} disabled={deleting}>Cancel</Button>
+                                                        <Button variant="destructive" size="sm" onClick={() => handleDelete(upload.id)} disabled={deleting}>
+                                                            {deleting ? 'Deleting...' : 'Delete'}
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <div>
+                                                        <p className="text-sm font-medium">{upload.fileName}</p>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            {new Date(upload.createdAt).toLocaleDateString()} · {upload.postCount} posts
+                                                        </p>
+                                                    </div>
+                                                    <Button variant="ghost" size="sm" onClick={() => { setPendingDeleteId(upload.id); setDeleteError('') }}>
+                                                        Delete
                                                     </Button>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <>
-                                                <div>
-                                                    <p className="text-sm font-medium">{upload.fileName}</p>
-                                                    <p className="text-xs text-muted-foreground">
-                                                        {new Date(upload.createdAt).toLocaleDateString()} · {upload.postCount} posts
-                                                    </p>
-                                                </div>
-                                                <Button variant="ghost" size="sm" onClick={() => { setPendingDeleteId(upload.id); setDeleteError('') }}>
-                                                    Delete
-                                                </Button>
-                                            </>
-                                        )}
-                                    </div>
-                                ))
-                            )}
-                            {deleteError && <p className="text-sm text-destructive">{deleteError}</p>}
-                        </div>
-                    )}
+                                                </>
+                                            )}
+                                        </div>
+                                    ))
+                                )}
+                                {deleteError && <p className="text-sm text-destructive">{deleteError}</p>}
+                            </div>
+                        )}
+                    </div>
                 </DialogContent>
             </Dialog>
         </main>
