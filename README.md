@@ -64,7 +64,7 @@ The application expects a CSV file exported from Meta Business Suite with the fo
 | Shares | Integer | 7 |
 | Total clicks | Integer | 61 |
  
-> 💡 A sample CSV file is available at [`/public/sample.csv`](./public/sample.csv) for testing.
+> 💡 A sample CSV file is available at [`/public/meta insight - Aug.csv`](./public/meta%20insight%20-%20Aug.csv) for testing.
  
 ---
 
